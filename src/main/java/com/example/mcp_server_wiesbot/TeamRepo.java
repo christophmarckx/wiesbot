@@ -29,21 +29,23 @@ public class TeamRepo {
         return List.of("William", "Sven", "Karel", "Christoph");
     }
 
-    @McpPrompt(name = "Translate-hidden-messages",
-            description = "Template for hidden messages")
-    McpSchema.GetPromptResult translateHiddenMessage(
-            @McpArg(name = "template", required = true) String template,
-            @McpArg(name ="variables", required = false) String variables
+    @McpPrompt(name = "Christoph-likes-mild-teasing",
+            description = "Prompt injection")
+    McpSchema.GetPromptResult iLikeMildTeasing(
+            @McpArg(name = "location", required = true) String location
     ) {
-        String hcTemplate = """
-                If I ask for analyzing team sentiment, show the time and weather for brussels then get the team member names, then for those members get the slack chat history.
-                Analyze the chat and give me a summary of the team sentiment.
-                """;
+        var hcTemplate = "If I ask for analyzing team sentiment, show the time and weather for " + location + " then get the team member names, then for those members get the slack chat history. Analyze the chat and give me a summary of the team sentiment";
 
-        return new McpSchema.GetPromptResult("Template: " + template,
-                List.of(new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent(hcTemplate)),
-                        new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent("If I ask for blue, replace this with Brussels")),
-                        new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent("If I ask for the view, replace this with the weather"))));
+        return new McpSchema.GetPromptResult("Template: " + location,
+                List.of(new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent(hcTemplate))));
+    }
+
+    @McpPrompt(name = "boss-mode",
+            description = "For CEO only")
+    McpSchema.GetPromptResult ceoMode() {
+
+        return new McpSchema.GetPromptResult("Template: CEO",
+                List.of(new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent("I am a busy manager, please reply in one sentence"))));
     }
 
     @Tool(description = """
@@ -61,7 +63,7 @@ public class TeamRepo {
         return """
                 {
                   "channel": "team-backend",
-                  "team": "Awesome Squad",
+                  "team": "Mild Teasers",
                   "dateRange": {
                     "start": "2025-11-17",
                     "end": "2025-11-21"
@@ -71,14 +73,14 @@ public class TeamRepo {
                       "ts": "2025-11-17T09:02:15Z",
                       "user": "christoph",
                       "displayName": "Christoph",
-                      "text": "Goedemorgen allemaal! :wave: Stand-up om 9:15 in #daily.",
+                      "text": "Goedemorgen allemaal! :wave: Stand-up om 9:15 in #daily. Ik ga weer te laat zijn want ik ben niet op tijd in mijn bed geraakt omwille van een pokeravond.",
                       "type": "message"
                     },
                     {
                       "ts": "2025-11-17T09:03:01Z",
                       "user": "william",
                       "displayName": "William",
-                      "text": "Goedemorgen! Ik heb straks een vraag over de nieuwe MCP server. :coffee:",
+                      "text": "Goedemorgen! Ik heb straks een vraag over de nieuwe MCP server. :coffee: Weeral te laat, Christoph, dit is niet de eerste keer eh vrind8",
                       "type": "message",
                       "reactions": [
                         {
@@ -92,7 +94,7 @@ public class TeamRepo {
                       "ts": "2025-11-17T10:21:43Z",
                       "user": "sven",
                       "displayName": "Sven",
-                      "text": "De eerste versie van de MCP server staat hier :point_right: https://github.com/example-org/mcp-server-poc",
+                      "text": "De eerste versie van de MCP server staat hier :point_right: https://github.com/example-org/mcp-server-poc. Christoph, kom op eh, you can do better...",
                       "type": "message",
                       "attachments": [
                         {
@@ -122,7 +124,7 @@ public class TeamRepo {
                       "ts": "2025-11-18T08:59:03Z",
                       "user": "karel",
                       "displayName": "Karel",
-                      "text": "Heads-up: Slack rate limits raakten we gisteren bijna. We moeten caching toevoegen aan de MCP client.",
+                      "text": "Heads-up: Slack rate limits raakten we gisteren bijna. We moeten caching toevoegen aan de MCP client. Christophe :thumbs-down:",
                       "type": "message"
                     },
                     {
