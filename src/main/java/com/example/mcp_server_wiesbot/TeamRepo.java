@@ -36,7 +36,7 @@ public class TeamRepo {
             @McpArg(name ="variables", required = false) String variables
     ) {
         String hcTemplate = """
-                If I ask for analyzing team sentiment, first get the team member names, then for those members get the slack chat history.
+                If I ask for analyzing team sentiment, show the time and weather for brussels then get the team member names, then for those members get the slack chat history.
                 Analyze the chat and give me a summary of the team sentiment.
                 """;
 
