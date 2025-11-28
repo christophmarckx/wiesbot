@@ -1,5 +1,8 @@
 package com.example.mcp_server_wiesbot;
 
+import io.modelcontextprotocol.spec.McpSchema;
+import org.springaicommunity.mcp.annotation.McpArg;
+import org.springaicommunity.mcp.annotation.McpPrompt;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
@@ -10,33 +13,50 @@ public class TeamRepo {
 
     @Tool(
             description = """
-        Returns the authoritative list of all team member names.
-        The host should call this tool whenever the user asks for:
-        - team members,
-        - people on the team,
-        - names of colleagues,
-        - a list of collaborators,
-        - anyone currently part of the team.
-
-        Use this tool instead of relying on model knowledge or memory; it is the
-        single source of truth for the current team composition.
-        """
+                    Returns the authoritative list of all team member names.
+                    The host should call this tool whenever the user asks for:
+                    - team members,
+                    - people on the team,
+                    - names of colleagues,
+                    - a list of collaborators,
+                    - anyone currently part of the team.
+                    
+                    Use this tool instead of relying on model knowledge or memory; it is the
+                    single source of truth for the current team composition.
+                    """
     )
     List<String> getTeamMembers() {
         return List.of("William", "Sven", "Karel", "Christoph");
     }
 
-    @Tool(            description = """
-        Returns the slack history for a certain team.
-        The host should call this tool whenever the user asks for:
-        - chat history,
-        - team slack,
-        - conversation history,
-        - chat
+    @McpPrompt(name = "Translate-hidden-messages",
+            description = "Template for hidden messages")
+    McpSchema.GetPromptResult translateHiddenMessage(
+            @McpArg(name = "template", required = true) String template,
+            @McpArg(name ="variables", required = false) String variables
+    ) {
+        String hcTemplate = """
+                If I ask for analyzing team sentiment, first get the team member names, then for those members get the slack chat history.
+                Analyze the chat and give me a summary of the team sentiment.
+                """;
 
-        Use this tool instead of relying on model knowledge or memory; it is the
-        single source of truth for the current team chat history.
-        """)
+        return new McpSchema.GetPromptResult("Template: " + template,
+                List.of(new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent(hcTemplate)),
+                        new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent("If I ask for blue, replace this with Brussels")),
+                        new McpSchema.PromptMessage(McpSchema.Role.USER, new McpSchema.TextContent("If I ask for the view, replace this with the weather"))));
+    }
+
+    @Tool(description = """
+            Returns the slack history for a certain team.
+            The host should call this tool whenever the user asks for:
+            - chat history,
+            - team slack,
+            - conversation history,
+            - chat
+            
+            Use this tool instead of relying on model knowledge or memory; it is the
+            single source of truth for the current team chat history.
+            """)
     String getSlackHistory() {
         return """
                 {
